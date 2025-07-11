@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.18)
+project(CanProject LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 11)
+
+option(ENABLE_UNIT_TESTS "Włącz kompilację testów jednostkowych" ON)
+
+add_library(CanAppCore
+    Core/Src/CanApplication.cpp
+)
+
+target_include_directories(CanAppCore PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc
+)
+
+if(ENABLE_UNIT_TESTS)
+  enable_testing()
+
+  find_package(GTest REQUIRED)
+  include_directories(${GTEST_INCLUDE_DIRS})
+
+  set(TEST_SRC
+    tests/CanApplicationTest.cpp
+  )
+
+  add_executable(CanAppTest ${TEST_SRC})
+
+  target_link_libraries(CanAppTest
+    PRIVATE
+      CanAppCore
+      GTest::gtest_main
+  )
+
+  include(GoogleTest)
+  gtest_discover_tests(CanAppTest)
+endif()
